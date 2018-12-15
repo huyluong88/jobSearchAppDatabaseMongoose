@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var mongoose = require('mongoose');
 let bcrypt = require('bcrypt');
+let jwt = require('jsonwebtoken');
 //connection to mongodb
 mongoose.connect('mongodb://localhost:27017/test');
 let Schema = mongoose.Schema;
@@ -26,7 +27,7 @@ router.get('/', (req, res, next) => {
 
 //sign up
 router.post('/signup', (req, res, next) => {
-  UserData.find({email: req.body.email}, (err, user) => {
+  UserData.find({ email: req.body.email }, (err, user) => {
     if (err) {
       return res.sendStatus(500).json(err);
     }
@@ -46,8 +47,46 @@ router.post('/signup', (req, res, next) => {
             if (err) {
               return res.json(err);
             }
-            return res.status(201).json({'message': 'User created'});
+            return res.status(201).json({message: 'User created'});
           })
+        }
+      })
+    }
+  })
+})
+
+//sign in
+router.post('/login', (req, res, next) => {
+  UserData.find({ email: req.body.email }, (err, user) => {
+    console.log('user ', user);
+    if (err) {
+      return res.sendStatus(500).json(err);
+    }
+    if (user.length < 1) {
+      return res.status(401).json({message: 'Auth failed'})
+    } else {
+      bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+        if (err) {
+          return res.status(401).json({message: 'Auth failed'})
+        }
+        //creates a jwt token if the password matches
+        if (result) {
+          let token = jwt.sign(
+            {
+              email: user[0].email,
+              id: user[0]._id,
+            },
+            'secret',
+            {
+              expiresIn: "1h"
+            }
+        )
+          return res.status(200).json({
+            message: 'Auth successful',
+            token: token
+          })
+        } else {
+          return res.status(401).json({message: 'Auth failed. Incorrect password'})
         }
       })
     }
