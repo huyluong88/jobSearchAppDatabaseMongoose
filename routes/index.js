@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 let bcrypt = require('bcrypt');
 let jwt = require('jsonwebtoken');
 //connection to mongodb
-mongoose.connect('mongodb://localhost:27017/test');
+mongoose.connect('mongodb://admin:admin1@ds237574.mlab.com:37574/jobs');
 let Schema = mongoose.Schema;
 
 let userDataSchema = new Schema({
