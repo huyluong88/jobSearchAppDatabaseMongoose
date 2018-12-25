@@ -57,6 +57,7 @@ router.post('/signup', (req, res, next) => {
 
 //sign in
 router.post('/login', (req, res, next) => {
+  console.log('login called ', req.body);
   UserData.find({ email: req.body.email }, (err, user) => {
     console.log('user ', user);
     if (err) {
