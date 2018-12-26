@@ -17,8 +17,23 @@ let userDataSchema = new Schema({
     },
   password: {type: String, required: true},
 }, {collection: 'users'});
+
+let jobInfoSchema = new Schema({
+  _id: mongoose.Schema.Types.ObjectId,
+  jobId: String,
+  location: Array,
+  organization_name: String,
+  position_title: String,
+  url: String,
+  start_date: String,
+  end_date: String,
+  ad: Date,
+  au: String,
+  userId: String,
+}, {collection: 'savedJobs'});
 //pass in scheman to act as the blueprint of this model
-let UserData = mongoose.model('UserData', userDataSchema)
+let UserData = mongoose.model('UserData', userDataSchema);
+let JobInfoData = mongoose.model('JobInfoData', jobInfoSchema);
 
 /* GET home page. */
 router.get('/', (req, res, next) => {
@@ -52,6 +67,30 @@ router.post('/signup', (req, res, next) => {
         }
       })
     }
+  })
+})
+
+router.post('/save-job', (req, res, next) => {
+  let job = new JobInfoData({
+    _id: new mongoose.Types.ObjectId(),
+    jobId: req.body.jobId,
+    location: req.body.locations,
+    organization_name: req.body.organization_name,
+    position_title: req.body.position_title,
+    url: req.body.url,
+    start_date: req.body.start_date,
+    end_date: req.body.end_date,
+    ad: new Date(),
+    au: req.body.email,
+    userId: req.body.userId,
+  })
+  console.log(job);
+  // console.log(req.body);
+  job.save((err, user) => {
+    if (err) {
+      return res.json(err);
+    }
+    return res.status(201).json({message: 'job added'})
   })
 })
 
