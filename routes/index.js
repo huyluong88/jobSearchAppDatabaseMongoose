@@ -71,26 +71,37 @@ router.post('/signup', (req, res, next) => {
 })
 
 router.post('/save-job', (req, res, next) => {
-  let job = new JobInfoData({
-    _id: new mongoose.Types.ObjectId(),
-    jobId: req.body.jobId,
-    location: req.body.locations,
-    organization_name: req.body.organization_name,
-    position_title: req.body.position_title,
-    url: req.body.url,
-    start_date: req.body.start_date,
-    end_date: req.body.end_date,
-    ad: new Date(),
-    au: req.body.email,
-    userId: req.body.userId,
-  })
-  console.log(job);
-  // console.log(req.body);
-  job.save((err, user) => {
+  JobInfoData.find({ $and: [
+    {jobId: req.body.id},
+    {au: req.body.au},
+    {userId: req.body.userId}
+  ] }, (err, job) => {
     if (err) {
-      return res.json(err);
+      return res.sendStatus(500);
     }
-    return res.status(201).json({message: 'job added'})
+    if (job.length >= 1) {
+      return res.sendStatus(409);
+    } else {
+      let job = new JobInfoData({
+        _id: new mongoose.Types.ObjectId(),
+        jobId: req.body.id,
+        location: req.body.locations,
+        organization_name: req.body.organization_name,
+        position_title: req.body.position_title,
+        url: req.body.url,
+        start_date: req.body.start_date,
+        end_date: req.body.end_date,
+        ad: new Date(),
+        au: req.body.au,
+        userId: req.body.userId,
+      })
+      job.save((err, user) => {
+        if (err) {
+          return res.json(err);
+        }
+        return res.status(201).json({message: 'job added'})
+      })
+    }
   })
 })
 
