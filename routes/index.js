@@ -105,6 +105,21 @@ router.post('/save-job', (req, res, next) => {
   })
 })
 
+router.get('/get-saved-jobs', (req, res, next) => {
+  JobInfoData.find({ $and: [
+    {au: 'test@test.com'},
+    {userId: '5c184440fb6fc04dd6eef64f'}
+  ]}, (err, jobs) => {
+    if (err) {
+      return res.sendStatus(500);
+    }
+    console.log('jobs from the logged in user ', jobs);
+    return res.json(jobs);
+  }).catch((err) => {
+      return res.json(err);
+  })
+})
+
 //sign in
 router.post('/login', (req, res, next) => {
   console.log('login called ', req.body);
